@@ -42,7 +42,6 @@ io.on('connection', function(socket){
     //var collectionOfUsers = db.collection('users');
     var collectionOfMessages = db.collection('messages');
     console.log('a user connected');
-
       if(activeNames.indexOf(username) == -1){
       activeNames.push(username);
       ind = activeNames.indexOf(username);
@@ -58,7 +57,9 @@ io.on('connection', function(socket){
           console.log(err);
         }else {
           if(doc == null){}else{
-            socket.emit('new message', {from: doc.from, to: doc.to, message: doc.message, time: doc.t});
+  console.log(socket.handshake.query.name+" Sending offline data");
+
+            socket.emit('new message', {from: doc.from, to: doc.to, message: doc.message, time: doc.time});
             console.log(doc);
             collectionOfMessages.remove({_id:doc._id},function(e,d){if(e){console.log(e);}else{console.log("Deletion Success");}});
           }
@@ -72,7 +73,7 @@ io.on('connection', function(socket){
             console.log(err);
           }else {
             if(doc == null){}else{
-              socket.emit('new message', {from: doc.from, to: doc.to, message: doc.message, time: doc.t});
+              socket.emit('new message', {from: doc.from, to: doc.to, message: doc.message, time: doc.time});
               console.log(doc);
               collectionOfMessages.remove({_id:doc._id},function(e,d){if(e){console.log(e);}else{console.log("Deletion Success");}});
             }
