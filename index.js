@@ -1,12 +1,12 @@
 var app = require('express')();
 var http = require('http').Server(app);
 //var addusers = require(__dirname+'\\addusers.js');
-var io = require('socket.io')(http);
+var io = require('socket.io')(http, {'pingInterval':2000,'pingTimeout':5000});
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 //var url = 'mongodb://localhost:27017/TalkSee';
 var url = 'mongodb://TalkAdmin:talkseepasss@localhost:27017/TalkSee';
-
+//new code!
 var nicknames = {};
 var clients = [];
 var namesUsed = [];
@@ -30,7 +30,7 @@ http.listen(3000, function(){
 
 io.on('connection', function(socket){
   console.log(socket.handshake.query.name);
-  var username = socket.handshake.query.name
+  var username = socket.handshake.query.name;
   //socket.emit('new message',{from: "ABC", to: "XYZ", message: "DEFHI"})
     MongoClient.connect(url, function (err, db) {
       if (err) {
