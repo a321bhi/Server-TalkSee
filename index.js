@@ -30,7 +30,7 @@ http.listen(3000, function(){
 
 io.on('connection', function(socket){
   console.log(socket.handshake.query.name);
-  var username = socket.handshake.query.name;
+  var username = socket.handshake.query.name
   //socket.emit('new message',{from: "ABC", to: "XYZ", message: "DEFHI"})
     MongoClient.connect(url, function (err, db) {
       if (err) {
