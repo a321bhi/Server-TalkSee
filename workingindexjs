@@ -1,7 +1,7 @@
 var app = require('express')();
 var http = require('http').Server(app);
 //var addusers = require(__dirname+'\\addusers.js');
-var io = require('socket.io')(http, {'pingInterval':2000,'pingTimeout':5000});
+var io = require('socket.io')(http);
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 //var url = 'mongodb://localhost:27017/TalkSee';
@@ -29,8 +29,7 @@ http.listen(3000, function(){
 });
 
 io.on('connection', function(socket){
-  console.log(socket.handshake.query.name);
-  var username = socket.handshake.query.name;
+  //console.log(socket.handshake.query.name);
   //socket.emit('new message',{from: "ABC", to: "XYZ", message: "DEFHI"})
     MongoClient.connect(url, function (err, db) {
       if (err) {
@@ -42,14 +41,15 @@ io.on('connection', function(socket){
     //var collectionOfUsers = db.collection('users');
     var collectionOfMessages = db.collection('messages');
     console.log('a user connected');
-
-      if(activeNames.indexOf(username) == -1){
-      activeNames.push(username);
-      ind = activeNames.indexOf(username);
-      console.log("Index is "+ind+"  Index is "+activeNames.indexOf(username));
+    socket.on('on',function(data){
+      if(activeNames.indexOf(data.username) == -1){
+      activeNames.push(data.username);
+      ind = activeNames.indexOf(data.username);
+      console.log("INdex is "+ind+"  Index is "+activeNames.indexOf(data.username));
       clients[ind] = socket;
-      nicknames[socket.id] = username;
+      nicknames[socket.id] = data.username;
       console.log(activeNames+" ind is "+ind);
+      var username = data.username;
       var cursor = collectionOfMessages.find({to: username});
       cursor.each(function(err,doc){
         if(err){
@@ -77,6 +77,7 @@ io.on('connection', function(socket){
           }
         });
       }
+    });
 
   socket.on('new message', function(data){
     console.log('message: ' + data.message);

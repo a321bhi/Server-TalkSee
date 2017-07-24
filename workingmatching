@@ -1,0 +1,191 @@
+working code of matching.js
+however topology gets destroyed...
+probable solution:
+use callbacks
+
+
+// using database FriendList for this
+
+var app = require('express')();
+var http = require('http').Server(app);
+//var addusers = require(__dirname+'\\addusers.js');
+var io = require('socket.io')(http);
+var mongodb = require('mongodb');
+var MongoClient = mongodb.MongoClient;
+var url = 'mongodb://localhost:27017/Matching';
+var bodyParser = require('body-parser');
+//for Android
+//app.use(bodyParser.urlencoded({ extended: true }));
+//for POSTMAN
+ app.use(bodyParser.urlencoded({ extended: false }));
+ app.use(bodyParser.json());
+var assert = require('assert');
+app.get('/', function(req, res){
+  //res.sendFile(__dirname + '/index.html');
+});
+app.post('/mg', function(req, res){
+  var user = req.body.username;
+  var gen = req.body.gender;
+  var pref = req.body.preference;
+
+  console.log(user);
+  MongoClient.connect(url, function (err, db) {
+    if (err) {
+      console.log('Unable to connect to the mongoDB server. Error:', err);
+    } //only for testing:
+    else{
+          console.log('Connection established to', url);
+    }
+    var collectionOfBuffer = db.collection('Matching');
+    collectionOfBuffer.insert({username:user,gender:gen,preference:pref});
+    var collectionOfMatches = db.collection('Matches');
+    collectionOfMatches.findOne({matches:user},function(err,doc){
+      if(doc == null){
+    var friends ="";
+    var a=false;
+    //gender=gen and preference= pref and username != user and a match table
+        var cursor = collectionOfBuffer.find({$and:{gender:pref,preference:gen,username:{$not : user}}});
+          cursor.each(function(err,doc){
+            if(err){
+              console.log(err);
+                res.status(500).send('Something broke!');
+            }else {
+              if(doc == null){
+                if(a==false){
+                  console.log("no one");
+                  res.send("");
+
+                }
+                if(a==true){
+                  console.log(friends);
+                    //res.send(friends);
+                    a= false;
+                }
+              }else{
+                a=true;
+                  collectionOfMatches.findOne({username:doc.username},function(err,doc){
+                    if(doc == null){
+                      res.send("Username "+doc.username);
+                      collectionOfMatches.insert({username:user, match:doc.username});
+                      collectionOfBuffer.deleteOne({username:doc.username});
+                      collectionOfBuffer.deleteOne({username:user});
+                    }
+                  }
+                  );
+              }
+                //friends+=" "+doc.f;
+                // res.send(doc);
+            }
+          });
+
+        }else {
+              collectionOfBuffer.deleteOne({username:user});
+              collectionOfMatches.findOne({match:user},function(err,doc){
+                if(doc==null){
+                collectionOfBuffer.deleteOne({username:doc.username});
+                res.send("Username "+doc.username);
+                }
+              });
+        }
+      });
+  db.close();
+});
+});
+
+
+//This code does not add and only checks
+app.post('/mg1', function(req, res){
+  var user = req.body.username;
+  var gen = req.body.gender;
+  var pref = req.body.preference;
+
+  console.log(user);
+  MongoClient.connect(url, function (err, db) {
+    if (err) {
+      console.log('Unable to connect to the mongoDB server. Error:', err);
+    } //only for testing:
+    else{
+          console.log('Connection established to', url);
+    }
+    var collectionOfBuffer = db.collection('Matching');
+    //collectionOfBuffer.insert({username:user,gender:gen,preference:pref});
+    var collectionOfMatches = db.collection('Matches');
+    collectionOfMatches.findOne({matches:user},function(err,doc){
+      if(doc== null){
+    var friends ="";
+    var a=false;
+    //gender=gen and preference= pref and username != user and a match table
+        var cursor = collectionOfBuffer.find({$and:{gender:pref,preference:gen,username:{$not : user}}});
+          cursor.each(function(err,doc){
+            if(err){
+              console.log(err);
+                res.status(500).send('Something broke!');
+            }else {
+              if(doc == null){
+                if(a==false){
+                  console.log("no one");
+                  res.send("");
+
+                }
+                if(a==true){
+                  console.log(friends);
+                    //res.send(friends);
+                    a= false;
+                }
+              }else{
+                a=true;
+                collectionOfMatches.findOne({username:doc.username},function(err,doc){
+                  if(doc== null){
+                  collectionOfMatches.insert({username:user, match:doc.username});
+                  collectionOfBuffer.deleteOne({username:doc.username});
+                  collectionOfBuffer.deleteOne({username:user});
+                res.send("Username "+doc.username);
+              }
+            });
+                //friends+=" "+doc.f;
+                // res.send(doc);
+              }
+            }
+          });
+        }
+        else {
+              collectionOfBuffer.deleteOne({username:user});
+
+              collectionOfMatches.findOne({match:user},function(err,doc){
+                if(doc==null){
+                  collectionOfBuffer.deleteOne({username:doc.username});
+              res.send("Username "+doc.username);}else{console.log("Error here second part");}
+            });
+        }});
+  db.close();
+});
+});
+
+
+http.listen(3003, function(){
+  console.log('listening on *:3003');
+});
+//
+// var user = "Darren";
+// var gen = "Male";
+// var pref = "Female";
+// console.log(user);
+// MongoClient.connect(url, function (err, db) {
+//   if (err) {
+//     console.log('Unable to connect to the mongoDB server. Error:', err);
+//   } //only for testing:
+//   else{
+//         console.log('Connection established to', url);
+//   }
+//   var collectionOfBuffer = db.collection('Matching');
+//   var doc = collectionOfBuffer.findOne({$and:[{gender:pref,preference:gen,username:{$not :/user/}}]},
+// function(err,doc){
+//
+//       if (doc) {
+//        var myName = doc.username;
+//
+//        console.log(myName);
+// }
+// }
+// );
+// });

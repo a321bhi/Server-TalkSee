@@ -1,0 +1,11 @@
+{
+  "name": "TalkSee",
+  "version": "0.0.1",
+  "description": "Chat Backend",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.10.2",
+    "mongodb": "^2.2.19",
+    "socket.io": "^1.7.2"
+  }
+}

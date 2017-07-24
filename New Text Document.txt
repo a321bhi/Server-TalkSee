@@ -1,0 +1,52 @@
+4VhonogTQkYm
+
+
+
+sudo mongo admin --username root --password 4VhonogTQkYm
+
+db.createUser(
+    {
+      user: "TalkAdmin",
+      pwd: "talkseepasss",
+      roles: [ "root"]
+    }
+)
+
+
+> mongo admin -u admin -p
+
+use Matching
+
+var user = {
+  "user" : "TalkAdmin",
+  "pwd" : "talkseepasss",
+  roles : [
+      {
+          "role" : "readWrite",
+          "db" : "Matching"
+      }
+  ]
+}
+
+db.createUser(user);
+
+
+sudo mongo admin --username TalkAdmin --password talkseepasss
+
+mongo ec2-35-166-4-27.us-west-2.compute.amazonaws.com/admin -u  TalkAdmin -p talkseepasss
+
+'mongodb://TalkAdmin:talkseepasss@ec2-35-166-4-27.us-west-2.compute.amazonaws.com:27017/dummyDB'
+
+3000  index.js
+3001  profile.js
+3002  friendlist.js
+3003  matching.js
+3004  addingFr.js
+3005  addusers.js
+7000  newRTC.js
+7001  Confirm.js
+
+forever start index.js profile.js friendlist.js matching.js addingFr.js addusers.js
+ec2-52-37-93-175.us-west-2.compute.amazonaws.com
+7000 rtc.js //not complete yet
+27017 mongoDB

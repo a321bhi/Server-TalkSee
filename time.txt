@@ -1,0 +1,91 @@
+66 onwards
+for(int i = 0; i < jsonArray.length(); i++){
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    userName = (String)jsonObject.get("username");
+                                    LoggedInSharedPreference.setUserName(getApplicationContext(),userName);
+                                    startService();
+                                    //SaveFromServer(userName);
+                                    SaveFrList(userName);
+                                    swipeActivityIntent = new Intent(LoginActivity.this,SwipeActivity.class);
+                                    startActivity(swipeActivityIntent);
+                                    finish();
+
+                                }
+
+
+//Test Code
+        Calendar cal = Calendar.getInstance();
+        TimeZone tz = cal.getTimeZone();
+
+/* debug: is it local time? */
+        Log.d("Time zone: ", tz.getDisplayName());
+
+/* date formatter in local timezone */
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE dd/MM/yyyy HH:mm");
+        sdf.setTimeZone(tz);
+
+/* print your timestamp and double check it's the date you expect */
+        long timestamp = Long.valueOf(msgList.get(i).getTime());
+        String localTime = sdf.format(new Date(timestamp));
+        String a[]= localTime.split(" ");
+        //a[0] is day ...Mon,Tue,Wed,...
+        //a[1] is dd/mm/yyyy
+        //a[2] is the time (e.g. 12:30)...this is what you have to display with every message in chat bubble
+        Log.d("Time: ", localTime);
+///
+///
+///
+/// //Test code ends here~!!!!
+
+
+
+
+
+
+
+
+
+// void SaveFromServer(final String name){
+//            StringRequest stringRequest = new StringRequest(Request.Method.POST, serverUrlProf, new Response.Listener<String>() {
+//                @Override
+//                public void onResponse(String response) {
+//                    try {
+//                        if (response.equals("unsuc")){
+//                            Toast.makeText(LoginActivity.this,"Invalid username",Toast.LENGTH_SHORT).show();
+//                        }
+//                        else
+//                        {
+//                            JSONArray jsonArray = new JSONArray(response);
+//                            for(int i = 0; i < jsonArray.length(); i++){
+//                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                                username = (String)jsonObject.get("username");
+//                                fullname = (String)jsonObject.get("fullname");
+//                                dob = (String)jsonObject.get("dob");
+//                                email = (String)jsonObject.get("email");
+//                                gender = (String)jsonObject.get("gender");
+//                            }
+//                            db_profile.addUser(username,fullname,dob,email,gender);
+//                            db_profile.close();
+//                        }
+//
+//                    }
+//                    catch (JSONException e){
+//
+//                    }
+//                }
+//            }, new Response.ErrorListener() {
+//                @Override
+//                public void onErrorResponse(VolleyError error) {
+//                    Toast.makeText(LoginActivity.this,error.toString(),Toast.LENGTH_SHORT).show();
+//                    error.printStackTrace();
+//
+//                }
+//            }){
+//                protected Map<String,String> getParams(){
+//                    Map<String,String> params = new HashMap<String, String>();
+//                    params.put("username",name);
+//                    return params;
+//                }
+//            };
+//            Singleton.getSingletonInstance(getApplicationContext()).addToRequestQueue(stringRequest);
+//        }

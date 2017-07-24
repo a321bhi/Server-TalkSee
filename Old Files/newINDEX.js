@@ -6,13 +6,14 @@ var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
 //var url = 'mongodb://localhost:27017/TalkSee';
 var url = 'mongodb://TalkAdmin:talkseepasss@localhost:27017/TalkSee';
-
+//new code!
 var nicknames = {};
 var clients = [];
 var namesUsed = [];
 var activeNames = [];
-var usersInRoom = [];
+var usersInRoom = {};
 var ind = 0;
+
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
@@ -47,7 +48,9 @@ io.on('connection', function(socket){
       activeNames.push(username);
       ind = activeNames.indexOf(username);
       console.log("Index is "+ind+"  Index is "+activeNames.indexOf(username));
-      clients[ind] = socket;
+      //clients[ind] = socket;
+      clients.push(socket);
+      usersInRoom[username]= socket;
       nicknames[socket.id] = username;
       console.log(activeNames+" ind is "+ind);
       var cursor = collectionOfMessages.find({to: username});
@@ -56,7 +59,7 @@ io.on('connection', function(socket){
           console.log(err);
         }else {
           if(doc == null){}else{
-            socket.emit('new message', {from: doc.from, to: doc.to, message: doc.message, time: doc.t});
+            socket.emit('new message', {from: doc.from, to: doc.to, message: doc.message, time: doc.time});
             console.log(doc);
             collectionOfMessages.remove({_id:doc._id},function(e,d){if(e){console.log(e);}else{console.log("Deletion Success");}});
           }
@@ -70,7 +73,7 @@ io.on('connection', function(socket){
             console.log(err);
           }else {
             if(doc == null){}else{
-              socket.emit('new message', {from: doc.from, to: doc.to, message: doc.message, time: doc.t});
+              socket.emit('new message', {from: doc.from, to: doc.to, message: doc.message, time: doc.time});
               console.log(doc);
               collectionOfMessages.remove({_id:doc._id},function(e,d){if(e){console.log(e);}else{console.log("Deletion Success");}});
             }
@@ -85,7 +88,8 @@ io.on('connection', function(socket){
     if(activeNames.indexOf(data.to) != -1){
       var i = activeNames.indexOf(data.to);
       //console.log(data+'hasoihfaisufash        '+i+'   sfasfas    '+clients[i]);
-      var sock = clients[i];
+      //var sock = clients[i];
+      var sock = usersInRoom[data.to];
       sock.emit('new message', {from: data.from, to: data.to, message: data.message, time : data.time});
     }else{
       //save in db
@@ -105,6 +109,7 @@ io.on('connection', function(socket){
     //   delete nicknames[socket.id];
     //  delete clients[a];
      //delete activeNames[a];
+     delete usersInRoom[nicknames[socket.id]];
     delete nicknames[socket.id];
      clients.splice(a,1);
      activeNames.splice(a,1);
@@ -132,4 +137,13 @@ function CheckIfActive(name,socket){
   }else {
     return false;
   }
+}
+
+function searchPerson() {
+  for(var i = 0, len = nicknames.length; i < len; i++) {
+    if (nicknames[i].hello === searchTerm) {
+        index = i;
+        break;
+    }
+}
 }

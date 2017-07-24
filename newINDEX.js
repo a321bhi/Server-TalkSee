@@ -81,7 +81,7 @@ io.on('connection', function(socket){
         });
       }
 
-  socket.on('new message', function(data){
+  socket.on('new message', function(data,callback){
     console.log('message: ' + data.message);
     //var from = nicknames[socket.id];
     console.log(activeNames);
@@ -102,7 +102,10 @@ io.on('connection', function(socket){
         }
       });
     }
+var responseMessage = {username:data.to, timeS:data.time};
+callback(responseMessage);
   });
+
   socket.on('disconnect', function(){
       var a = activeNames.indexOf(nicknames[socket.id]);
       console.log('the user leaving is '+nicknames[socket.id]);
@@ -116,6 +119,12 @@ io.on('connection', function(socket){
      db.close();
      console.log('user disconnected');
   });
+});//this is mongodb closing bracket!
+  //This is for SearchingMatch!
+  socket.on('matchConfirmation', function(data){
+    console.log('decision: ' + data.decision);
+      var sock = usersInRoom[data.to];
+      sock.emit('matchConfirmation', {from: data.from, to: data.to, decision: data.decision});
   });
 });
 function updateActiveStatus(socket){
